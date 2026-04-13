@@ -4,6 +4,8 @@ RUN apt install -y binutils gcc
 WORKDIR /examples
 COPY /examples/example1.s /examples/example1.s
 COPY /examples/example2.s /examples/example2.s
+COPY /examples/test1.s /examples/test1.s
 RUN gcc -nostdlib example1.s -o example1
 RUN gcc -nostdlib example2.s -o example2
-CMD ["sh", "-c", "./example1 && ./example2"]
+RUN gcc -nostdlib test1.s -o test1
+CMD ["sh", "-c", "./example1 && ./example2 && ./test1"]
