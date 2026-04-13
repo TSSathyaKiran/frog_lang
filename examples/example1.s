@@ -1,6 +1,6 @@
 .global _start
 .data
-    message: .ascii "hi"
+    message: .ascii "hi\n"
     len = . - message
 .section .text
 _start:

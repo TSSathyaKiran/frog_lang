@@ -5,6 +5,6 @@ _start:
     mov x1, #2
     add x2, x1, x0
 
-    mov x0, #0
+    mov x0, x2
     mov x8, #93
-    svc #0
+    svc #0 
