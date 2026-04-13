@@ -22,5 +22,5 @@ docker build --platform linux/arm64 -t frog .
 
 run the container:
 ```bash
-docker run --platform linux/arm64 frog
+docker run frog
 ```
