@@ -5,11 +5,17 @@ class Lexer:
         self.tokens = []
         for line in self.lines:
             self.tokens.append(line.split(" "))
+
+    def getToken(self):
+        token = None
+
+
         
 class Token:
     def __init__(self, token, type):
         self.token = token
         self.type = type
+    
 
 
 from enum import Enum
