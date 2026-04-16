@@ -24,3 +24,19 @@ run the container:
 ```bash
 docker run frog
 ```
+
+Dockerfile.test runs all test files and shows outputs:
+```bash
+docker build -f Dockerfile.test -t frog_test .
+```
+```bash
+docker run frog_test
+```
+
+Dockerfile.dev gives a live ubuntu environment for testing and debugging any files live:
+```bash
+docker build -f Dockerfile.dev -t frog_dev .
+```
+```bash
+docker run -it -v $(pwd):/frog frog_dev
+```
