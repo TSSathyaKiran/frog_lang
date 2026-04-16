@@ -6,9 +6,50 @@ class Lexer:
         for line in self.lines:
             self.tokens.append(line.split(" "))
 
-    def getToken(self):
+    def getToken(self, preToken):
         token = None
+        if preToken == "+":
+            token = Token(preToken, TOKENS.ADD)
+        elif preToken == "-":
+            token = Token(preToken, TOKENS.SUB)
+        elif preToken == "*":
+            token = Token(preToken, TOKENS.MUL)
+        elif preToken == "/":
+            token = Token(preToken, TOKENS.DIV)
+        elif preToken == "=":
+            token = Token(preToken, TOKENS.EQ)
+        elif preToken == ">=":
+            token = Token(preToken, TOKENS.GTEQ)
+        elif preToken == "<=":
+            token = Token(preToken, TOKENS.LTEQ)
+        elif preToken == ">":
+            token = Token(preToken, TOKENS.GT)
+        elif preToken == "<":
+            token = Token(preToken, TOKENS.LT)
+        elif preToken == "!=":
+            token = Token(preToken, TOKENS.NOEQ)
+        elif preToken == "==":
+            token = Token(preToken, TOKENS.EQEQ)
+        elif preToken == "print":
+            token = Token(preToken, TOKENS.PRINT)
+        elif preToken == "input":
+            token = Token(preToken, TOKENS.INPUT)
+        elif preToken.isdigit():
+            token = Token(preToken, TOKENS.NUMBER)
+        elif preToken.isidentifier():
+            token = Token(preToken, TOKENS.IDENTIFIER)
 
+        elif preToken.startswith('"') and preToken.endswith('"'):
+            token = token[1:-1]
+            token = Token(preToken, TOKENS.STRING)
+            #should add illegal character check here
+            #later
+        
+        elif isinstance(preToken, int) or isinstance(preToken, float):
+            token = Token(preToken, TOKENS.NUMBER)
+            #idk float in assembly, how to check
+        
+        
 
         
 class Token:
