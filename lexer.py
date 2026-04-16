@@ -47,7 +47,7 @@ class Lexer:
         
         elif isinstance(preToken, int) or isinstance(preToken, float):
             token = Token(preToken, TOKENS.NUMBER)
-            #idk float in assembly, how to check
+            #idk float in assembly, have to check
         
         
 
