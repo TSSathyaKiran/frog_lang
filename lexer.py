@@ -1,10 +1,24 @@
 class Lexer:
     def __init__(self, syn):
         self.syn = syn
-        self.lines = self.syn.split("\n")
-        self.tokens = []
-        for line in self.lines:
-            self.tokens.append(line.split(" "))
+        self.curChar = ""
+        self.curPos = -1
+        self.nextChar()
+
+    def nextChar(self):
+        # just moves to the next char
+        # if end reached then EOF so \0
+        self.curPos += 1
+        if self.curPos >= len(self.syn):
+            self.curChar = '\0'
+        else:
+            self.curChar = self.syn[self.curPos]
+    
+    def peek(self):
+        # to check next char
+        if self.curPos + 1 >= len(self.syn):
+            return '\0'
+        return self.syn[self.curPos + 1]
 
     def getToken(self, preToken):
         token = None
@@ -87,6 +101,9 @@ def main():
     with open("tests/test1.frg", "r") as f:
         code = f.read()
         lexer = Lexer(code)
-        print(lexer.tokens)
+        
+        while lexer.peek() != '\0':
+            print(lexer.curChar)
+            lexer.nextChar()
 
 main()
