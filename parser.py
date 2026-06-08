@@ -1,3 +1,4 @@
+import sys
 from lexer import *
 
 class parser:
@@ -76,6 +77,8 @@ class parser:
     def statement(self):
         if self.checkToken(TokenType.PRINT):
             self.printStatement()
+        
+        self.nl()
 
 
     def program(self):
@@ -85,10 +88,6 @@ class parser:
  
         while not self.checkToken(TokenType.EOF):
             self.statement()
-        
-        var_space = max(self.nextOffset, 16)
-        if var_space % 16 != 0:
-            var_space += 16 - (var_space % 16)
 
         if self.strings:
             self.emitter.headerLine(".section .data")
@@ -103,14 +102,10 @@ class parser:
 
 
         self.emitter.headerLine("_start:")
-        # set up stack 
+
         self.emitter.headerLine("    stp  x29, x30, [sp, #-16]!")
         self.emitter.headerLine("    mov  x29, sp")
-        # reserve stack space for all declared variables
-        self.emitter.headerLine(f"    sub  sp,  sp,  #{var_space}")
 
-        self.emitter.emitLine(f"    add  sp,  sp,  #{var_space}")
-        self.emitter.emitLine( "    ldp  x29, x30, [sp], #16")
         self.emitter.emitLine( "    mov  x0,  #0")  
         self.emitter.emitLine( "    mov  x8,  #93")  
         self.emitter.emitLine( "    svc  #0")

@@ -155,8 +155,7 @@ class Token:
     @staticmethod
     def checkIfKeyword(tokenText):
         for kind in TokenType:
-            # Relies on all keyword enum values being 1XX.
-            if kind.name == tokenText and kind.value >= 100 and kind.value < 200:
+            if kind.name == tokenText.upper() and 100 <= kind.value < 200:
                 return kind
         return None
 
