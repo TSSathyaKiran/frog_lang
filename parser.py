@@ -1,7 +1,7 @@
 import sys
 from lexer import *
 
-class parser:
+class Parser:
     def __init__(self, lexer, emitter):
         self.lexer = lexer
         self.emitter = emitter
