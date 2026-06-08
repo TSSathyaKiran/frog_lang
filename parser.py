@@ -5,8 +5,11 @@ class parser:
         self.lexer = lexer
         self.emitter = emitter
 
-        self.strings = []
+        self.strings = [] # stores the string literals
         self.strCount = 0
+
+        self.symbols    = {} #symbols store names of variables and offsets
+        self.nextOffset = 0
 
         self.curToken = None
         self.peekToken = None
@@ -32,3 +35,10 @@ class parser:
  
     def abort(self, message):
         sys.exit("Parser error: " + message)
+
+
+    def getOffset(self, name):
+        if name not in self.symbols:
+            self.abort(f"undefined variable: {name}")
+        return self.symbols[name]
+    
