@@ -42,3 +42,77 @@ class parser:
             self.abort(f"undefined variable: {name}")
         return self.symbols[name]
     
+
+    def printString(self):
+        text  = self.curToken.text
+        label = f"str_{self.strCount}"
+        self.strCount += 1
+        self.strings.append((label, text))
+        self.nextToken()
+
+        self.emitter.emitLine(f"    adrp x1, {label}")
+        self.emitter.emitLine(f"    add  x1, x1, :lo12:{label}")
+        self.emitter.emitLine(f"    mov  x2, #{len(text) + 1}")
+
+        self.emitter.emitLine( "    mov  x0, #1")
+        self.emitter.emitLine( "    mov  x8, #64")   
+        self.emitter.emitLine( "    svc  #0")
+
+        #print in arm64:
+
+        # adrp x1, str_0
+        # add  x1, x1, :lo12:str_0
+        # mov  x2, #12
+        # mov  x0, #1
+        # mov  x8, #64
+        # svc  #0
+
+
+    def printStatement(self):
+        self.nextToken()
+        if self.checkToken(TokenType.STRING):
+            self.printString()
+ 
+    def statement(self):
+        if self.checkToken(TokenType.PRINT):
+            self.printStatement()
+
+
+    def program(self):
+
+        while self.checkToken(TokenType.NEWLINE):
+            self.nextToken()
+ 
+        while not self.checkToken(TokenType.EOF):
+            self.statement()
+        
+        var_space = max(self.nextOffset, 16)
+        if var_space % 16 != 0:
+            var_space += 16 - (var_space % 16)
+
+        if self.strings:
+            self.emitter.headerLine(".section .data")
+            for label, text in self.strings:
+                # .asciz automatically null terminates
+                self.emitter.headerLine(f'{label}: .asciz "{text}\\n"')
+            self.emitter.headerLine("")
+
+        self.emitter.headerLine(".section .text")
+        self.emitter.headerLine(".global _start")
+        self.emitter.headerLine("")
+
+
+        self.emitter.headerLine("_start:")
+        # set up stack 
+        self.emitter.headerLine("    stp  x29, x30, [sp, #-16]!")
+        self.emitter.headerLine("    mov  x29, sp")
+        # reserve stack space for all declared variables
+        self.emitter.headerLine(f"    sub  sp,  sp,  #{var_space}")
+
+        self.emitter.emitLine(f"    add  sp,  sp,  #{var_space}")
+        self.emitter.emitLine( "    ldp  x29, x30, [sp], #16")
+        self.emitter.emitLine( "    mov  x0,  #0")  
+        self.emitter.emitLine( "    mov  x8,  #93")  
+        self.emitter.emitLine( "    svc  #0")
+
+        self.emitter.writeFile()
