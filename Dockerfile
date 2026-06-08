@@ -1,11 +1,18 @@
 FROM ubuntu:latest
-RUN apt update 
-RUN apt install -y binutils gcc
-WORKDIR /examples
-COPY /examples/example1.s /examples/example1.s
-COPY /examples/example2.s /examples/example2.s
-COPY /examples/test1.s /examples/test1.s
-RUN gcc -nostdlib example1.s -o example1
-RUN gcc -nostdlib example2.s -o example2
-RUN gcc -nostdlib test1.s -o test1
-CMD ["sh", "-c", "./example1 && ./example2 && ./test1"]
+
+RUN apt update && apt install -y --fix-missing python3 binutils
+
+WORKDIR /frog
+
+COPY lexer.py .
+COPY emitter.py .
+COPY parser.py .
+COPY frgcompiler.py .
+
+COPY tests/test1.frg .
+
+RUN python3 frgcompiler.py test1.frg
+RUN as -o out.o out.s
+RUN ld -o out out.o
+
+CMD ["./out"]
