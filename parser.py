@@ -48,18 +48,22 @@ class Parser:
             self.abort(f"undefined variable: {name}")
         return self.symbols[name]
     
+    def emitWriteString(self, label, length):
+
+        self.emitter.emitLine(f"    adrp x1, {label}")
+        self.emitter.emitLine(f"    add  x1, x1, :lo12:{label}")
+        self.emitter.emitLine(f"    mov  x2, #{length + 1}")
+        self.emitter.emitLine( "    mov  x0, #1")
+        self.emitter.emitLine( "    mov  x8, #64")
+        self.emitter.emitLine( "    svc  #0")
+
+
     def printString(self):
         text  = self.curToken.text
         label = self.registerString(text)
         self.nextToken()
 
-        self.emitter.emitLine(f"    adrp x1, {label}")
-        self.emitter.emitLine(f"    add  x1, x1, :lo12:{label}")
-        self.emitter.emitLine(f"    mov  x2, #{len(text) + 1}")
-
-        self.emitter.emitLine( "    mov  x0, #1")
-        self.emitter.emitLine( "    mov  x8, #64")   
-        self.emitter.emitLine( "    svc  #0")
+        self.emitWriteString(label, len(text))
 
         #print in arm64:
 
@@ -100,15 +104,10 @@ class Parser:
 
             if varName not in self.symbols:
                 self.abort(f"undefined variable: {varName}")
-                
-            var = self.symbols[varName]
-            self.emitter.emitLine(f"    adrp x1, {var['label']}")
-            self.emitter.emitLine(f"    add  x1, x1, :lo12:{var['label']}")
-            self.emitter.emitLine(f"    mov  x2, #{var['len'] + 1}")
-            self.emitter.emitLine( "    mov  x0, #1")
-            self.emitter.emitLine( "    mov  x8, #64")
-            self.emitter.emitLine( "    svc  #0")
 
+            var = self.symbols[varName]
+            self.emitWriteString(var["label"], var["len"])
+            
     def statement(self):
         if self.checkToken(TokenType.PRINT):
             self.printStatement()
