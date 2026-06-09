@@ -1,35 +1,3 @@
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-
-
-
-
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
-print "hello world"
-print "hi"
+hi = "wassip"
+print hi
+print "hellow workd"

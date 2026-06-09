@@ -37,18 +37,20 @@ class Parser:
     def abort(self, message):
         sys.exit("Parser error: " + message)
 
+    def registerString(self, text):
+        label = f"str_{self.strCount}"
+        self.strCount += 1
+        self.strings.append((label, text))
+        return label
 
     def getOffset(self, name):
         if name not in self.symbols:
             self.abort(f"undefined variable: {name}")
         return self.symbols[name]
     
-
     def printString(self):
         text  = self.curToken.text
-        label = f"str_{self.strCount}"
-        self.strCount += 1
-        self.strings.append((label, text))
+        label = self.registerString(text)
         self.nextToken()
 
         self.emitter.emitLine(f"    adrp x1, {label}")
@@ -68,18 +70,54 @@ class Parser:
         # mov  x8, #64
         # svc  #0
 
+    def assignment(self):
+        varName = self.curToken.text
+        self.nextToken()
+        self.match(TokenType.EQ)
+ 
+        # right now only string assignment is supported
+        if not self.checkToken(TokenType.STRING):
+            self.abort("only string assignment supported right now")
+ 
+        text  = self.curToken.text
+        label = self.registerString(text)
+        self.nextToken()
+ 
+        # store the label and length so print can use it later
+        self.symbols[varName] = {"type": "string", "label": label, "len": len(text)}
+
+
 
     def printStatement(self):
         self.nextToken()
+
         if self.checkToken(TokenType.STRING):
             self.printString()
- 
+        
+        elif self.checkToken(TokenType.IDENT):
+            varName = self.curToken.text
+            self.nextToken()
+
+            if varName not in self.symbols:
+                self.abort(f"undefined variable: {varName}")
+                
+            var = self.symbols[varName]
+            self.emitter.emitLine(f"    adrp x1, {var['label']}")
+            self.emitter.emitLine(f"    add  x1, x1, :lo12:{var['label']}")
+            self.emitter.emitLine(f"    mov  x2, #{var['len'] + 1}")
+            self.emitter.emitLine( "    mov  x0, #1")
+            self.emitter.emitLine( "    mov  x8, #64")
+            self.emitter.emitLine( "    svc  #0")
+
     def statement(self):
         if self.checkToken(TokenType.PRINT):
             self.printStatement()
-        
+ 
+        elif self.checkToken(TokenType.IDENT):
+            self.assignment()
+ 
         self.nl()
-
+ 
 
     def program(self):
 
